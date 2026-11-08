@@ -1,11 +1,11 @@
 name = "Los Create Aeronautics"
-version = "1.0.0"
+version = "1.1.0"
 pack-format = "packwiz:1.1.0"
 
 [index]
 file = "index.toml"
 hash-format = "sha256"
-hash = "9ad0118b05e60dd221344fdee5f476e1aaee8065827b92d4f398f44ffe719965"
+hash = "6a7383bbaea31012c62423aa13450a4efe6c350ae6fd1cbab3eba5330c0f222e"
 
 [versions]
 minecraft = "1.21.1"

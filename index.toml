@@ -15,3 +15,8 @@ file = "mods/sable.pw.toml"
 hash = "f4812ef33d9fa2a93dbbbde59b5a9a385186592e56292508eea379a04f5c5482"
 metafile = true
 
+[[files]]
+file = "mods/sodium.pw.toml"
+hash = "231ac797e4dd317a9ffc080d3be9eb9b0846fbfdd1629083eb7f846c22f0efe7"
+metafile = true
+
