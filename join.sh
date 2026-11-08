@@ -37,20 +37,21 @@ DIR="$DATA/instances/$INSTANCE"
 MC="$DIR/.minecraft"
 say "Creating instance in $DIR"
 mkdir -p "$MC"
-if [ ! -f "$DIR/instance.cfg" ]; then
-  cat > "$DIR/instance.cfg" <<'CFG'
-InstanceType=OneSix
-iconKey=default
-name=Create Aeronautics
-OverrideCommands=true
-PreLaunchCommand="\"$INST_JAVA\" -jar packwiz-installer-bootstrap.jar https://raw.githubusercontent.com/loswastaken/create-aeronautics-pack/main/pack.toml"
-CFG
+if pgrep -x prismlauncher >/dev/null 2>&1; then echo "Close Prism Launcher first, then run this again (it would overwrite the changes)."; exit 1; fi
+CFG="$DIR/instance.cfg"
+if [ ! -f "$CFG" ]; then
+  printf '%s\n' "InstanceType=OneSix" "iconKey=default" "name=Create Aeronautics" > "$CFG"
   cat > "$DIR/mmc-pack.json" <<'PACK'
 {"components":[{"cachedName":"Minecraft","cachedVersion":"1.21.1","important":true,"uid":"net.minecraft","version":"1.21.1"},{"cachedName":"NeoForge","cachedRequires":[{"equals":"1.21.1","uid":"net.minecraft"}],"cachedVersion":"21.1.265","uid":"net.neoforged","version":"21.1.265"}],"formatVersion":1}
 PACK
 else
-  echo "Instance already exists; keeping its settings."
+  echo "Instance already exists; refreshing its launch command."
 fi
+# Prism 11 keeps the quotes literally, so write the command with plain quotes and no outer quotes or backslashes.
+{ grep -v -e '^PreLaunchCommand=' -e '^OverrideCommands=' "$CFG" || true
+  echo "OverrideCommands=true"
+  echo "PreLaunchCommand=\"\$INST_JAVA\" -jar packwiz-installer-bootstrap.jar $PACK_URL"; } > "$CFG.new"
+mv "$CFG.new" "$CFG"
 
 say "Downloading the mod sync tool"
 TMP="$(mktemp)"; trap 'rm -f "$TMP"' EXIT

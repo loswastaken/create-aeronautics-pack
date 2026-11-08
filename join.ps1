@@ -6,6 +6,7 @@ $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $Instance = 'Create Aeronautics'
+$PackUrl = 'https://raw.githubusercontent.com/loswastaken/create-aeronautics-pack/main/pack.toml'
 $BootUrl = 'https://github.com/packwiz/packwiz-installer-bootstrap/releases/download/v0.0.3/packwiz-installer-bootstrap.jar'
 $BootSha = 'a8fbb24dc604278e97f4688e82d3d91a318b98efc08d5dbfcbcbcab6443d116c'
 $ServersB64 = 'CgAACQAHc2VydmVycwoAAAACCAACaXAAG2Rvcmt1bmlmeS5kdWNrZG5zLm9yZzoyNTU2OAgABG5hbWUAEkNyZWF0ZSBBZXJvbmF1dGljcwAIAAJpcAARMTAuMjQuNC4xNDM6MjU1NjgIAARuYW1lAB1DcmVhdGUgQWVyb25hdXRpY3MgKGhvbWUvVlBOKQAA'
@@ -27,20 +28,20 @@ $Dir = Join-Path $Data "instances\$Instance"
 $Mc = Join-Path $Dir '.minecraft'
 Say "Creating instance in $Dir"
 New-Item -ItemType Directory -Force -Path $Mc | Out-Null
-if (-not (Test-Path (Join-Path $Dir 'instance.cfg'))) {
-    $cfg = @'
-InstanceType=OneSix
-iconKey=default
-name=Create Aeronautics
-OverrideCommands=true
-PreLaunchCommand="\"$INST_JAVA\" -jar packwiz-installer-bootstrap.jar https://raw.githubusercontent.com/loswastaken/create-aeronautics-pack/main/pack.toml"
-'@
-    $pack = '{"components":[{"cachedName":"Minecraft","cachedVersion":"1.21.1","important":true,"uid":"net.minecraft","version":"1.21.1"},{"cachedName":"NeoForge","cachedRequires":[{"equals":"1.21.1","uid":"net.minecraft"}],"cachedVersion":"21.1.265","uid":"net.neoforged","version":"21.1.265"}],"formatVersion":1}'
-    [IO.File]::WriteAllText((Join-Path $Dir 'instance.cfg'), (($cfg -replace "`r?`n", "`n") + "`n"), $utf8)
-    [IO.File]::WriteAllText((Join-Path $Dir 'mmc-pack.json'), $pack + "`n", $utf8)
+if (Get-Process -Name prismlauncher -ErrorAction SilentlyContinue) { throw 'Close Prism Launcher first, then run this again (it would overwrite the changes).' }
+$cfgPath = Join-Path $Dir 'instance.cfg'
+if (Test-Path $cfgPath) {
+    Write-Host 'Instance already exists; refreshing its launch command.'
+    $lines = @(Get-Content $cfgPath | Where-Object { $_ -notmatch '^(PreLaunchCommand|OverrideCommands)=' })
 } else {
-    Write-Host 'Instance already exists; keeping its settings.'
+    $lines = @('InstanceType=OneSix', 'iconKey=default', 'name=Create Aeronautics')
+    $pack = '{"components":[{"cachedName":"Minecraft","cachedVersion":"1.21.1","important":true,"uid":"net.minecraft","version":"1.21.1"},{"cachedName":"NeoForge","cachedRequires":[{"equals":"1.21.1","uid":"net.minecraft"}],"cachedVersion":"21.1.265","uid":"net.neoforged","version":"21.1.265"}],"formatVersion":1}'
+    [IO.File]::WriteAllText((Join-Path $Dir 'mmc-pack.json'), $pack + "`n", $utf8)
 }
+# Prism 11 keeps the quotes literally, so write the command with plain quotes and no outer quotes or backslashes.
+$lines += 'OverrideCommands=true'
+$lines += ('PreLaunchCommand="$INST_JAVA" -jar packwiz-installer-bootstrap.jar ' + $PackUrl)
+[IO.File]::WriteAllText($cfgPath, (($lines -join "`n") + "`n"), $utf8)
 
 Say 'Downloading the mod sync tool'
 $tmp = Join-Path $env:TEMP 'packwiz-installer-bootstrap.jar'
