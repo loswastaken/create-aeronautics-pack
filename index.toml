@@ -1,0 +1,17 @@
+hash-format = "sha256"
+
+[[files]]
+file = "mods/create-aeronautics.pw.toml"
+hash = "ac9c9958f5d78cc4e8a5c7eb792e9454f29dca9b0d978731b06b0070f8966a21"
+metafile = true
+
+[[files]]
+file = "mods/create.pw.toml"
+hash = "70a8c4a77c6de1a3769e2c00b279c6ff904f7572d0fc097a72e7a33ec444fcd5"
+metafile = true
+
+[[files]]
+file = "mods/sable.pw.toml"
+hash = "f4812ef33d9fa2a93dbbbde59b5a9a385186592e56292508eea379a04f5c5482"
+metafile = true
+
